@@ -1,0 +1,56 @@
+/* layout.css */
+
+/* Contenedor principal */
+.min-h-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Contenedor del contenido principal */
+.flex {
+  display: flex;
+  flex-grow: 1;
+}
+
+/* Sidebar */
+aside {
+  width: 160px; /* Cambiado de 250px a 160px para hacer la sidebar más delgada */
+  background-color: var(--color-soft);
+  color: white;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+aside h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+aside button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  background-color: var(--color-blue);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 15px;
+}
+
+aside button:hover {
+  background-color: var(--color-lime);
+}
+
+/* Main Content */
+main {
+  flex-grow: 1;
+  background-color: var(--color-white);
+  padding: 20px;
+  overflow-y: auto;
+}

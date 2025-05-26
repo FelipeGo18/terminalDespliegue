@@ -1,0 +1,12 @@
+/* variables.css */
+
+/* Paleta de colores original */
+:root {
+  --color-blue: #0d6efd;
+  --color-sky: #0dcaf0;
+  --color-lime: #198754;
+  --color-soft: #d1ecf1;
+  --color-white: #ffffff;
+  --color-fondo: #003B70;
+  --gradient-header-green: linear-gradient(to right, var(--color-sky), var(--color-lime));
+}

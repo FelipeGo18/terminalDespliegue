@@ -1,0 +1,14 @@
+/* base.css */
+
+/* Estilo para el cuerpo */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--gradient-header-green);
+}
+
+/* Custom button styles */
+.full-rounded {
+  border-radius: 2em;
+}

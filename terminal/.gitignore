@@ -1,0 +1,19 @@
+
+# Build outputs
+dist/
+build/
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+
+# Database folder
+
+
+
+# IDE-specific files
+.vscode/
+.idea/

@@ -1,0 +1,50 @@
+/* buttons.css */
+
+/* Variables de color base para mejorar la personalización */
+:root {
+  --color-blue: #2563eb;
+  --color-lime: #84cc16;
+  --color-white: #ffffff;
+  --color-blue-dark: #1e40af;
+}
+
+/* Botón general */
+.header-button,
+.route-button {
+  background-color: var(--color-blue);
+  color: var(--color-white);
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Hover */
+.header-button:hover,
+.route-button:hover {
+  background-color: var(--color-lime);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Focus accesible */
+.header-button:focus,
+.route-button:focus {
+  outline: 3px solid var(--color-lime);
+  outline-offset: 2px;
+}
+
+/* Active (click) */
+.header-button:active,
+.route-button:active {
+  transform: scale(0.98);
+  background-color: var(--color-blue-dark);
+}
+

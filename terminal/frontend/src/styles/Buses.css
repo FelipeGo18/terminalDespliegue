@@ -1,0 +1,128 @@
+/* 🌟 Contenedor principal */
+.bus-container {
+  max-width: 850px;
+  margin: auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 🛑 Mensaje de error */
+.bus-error {
+  color: #e74c3c;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(231, 76, 60, 0.1);
+}
+
+/* 🏢 Empresas como tarjetas elegantes */
+.bus-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.bus-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 14px;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.bus-card:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #2980b9, #1f618d);
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* 🛣️ Sección de rutas */
+.routes-section {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 🚍 Botón de rutas */
+.route-button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #3498db;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.route-button:hover {
+  background: #2980b9;
+  transform: scale(1.05);
+}
+
+/* 🚍 Elemento de ruta */
+.route-item {
+  background: linear-gradient(135deg, #3498db, #2980b9); /* Igual que .bus-card */
+  color: white;
+  padding: 8px 15px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  transition: 0.3s;
+  margin-bottom: 18px; /* Espacio entre rutas */
+}
+
+.route-item:hover {
+  background: linear-gradient(135deg, #2980b9, #1f618d); /* Igual que .bus-card:hover */
+}
+
+/* 🎟️ Sección de viajes */
+.trips-section {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.trip-list {
+  list-style: none;
+  padding: 0;
+}
+
+.trip-item {
+  padding: 14px;
+  border-radius: 8px;
+  background: #f9f9f9;
+  margin-bottom: 10px;
+  transition: 0.3s;
+  color: #1a237e; /* Azul oscuro, buen contraste */
+  font-weight: bold;
+}
+
+.trip-item:hover {
+  background: #e6f4ff;
+}
+
+.no-trips {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #777;
+  padding: 15px;
+}

@@ -1,0 +1,23 @@
+GET http://localhost:4004/api/rutas
+
+### Obtener todos los usuarios
+GET http://localhost:4004/api/usuarios
+
+### Obtener todos los tickets
+GET http://localhost:4004/api/empresas
+
+
+### Obtener todos los rutas
+GET http://localhost:4004/api/rutas
+
+### obtener todos los buses
+GET http://localhost:4004/api/buses
+
+
+
+### obtener todos los viajes
+GET http://localhost:4004/api/viajes
+
+
+### prueba
+GET http://localhost:5000/api/buses

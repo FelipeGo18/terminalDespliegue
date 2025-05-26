@@ -1,0 +1,268 @@
+.admin-panel-container {
+  max-width: 900px;
+  margin: 40px auto;
+  /* Fondo blanco con degradado translúcido para dejar ver la imagen de fondo */
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.93) 0%,
+    rgba(255,255,255,0.89) 40%,
+    rgba(255,255,255,0.85) 100%
+  );
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: unset;
+  height: auto;
+  justify-content: flex-start;
+  transition: min-height 0.3s, height 0.3s, max-width 0.3s;
+  max-height: none; /* Elimina restricciones de altura y scroll */
+  overflow-y: auto; /* Permite hacer scroll si el contenido es muy largo */
+  padding-bottom: 80px; /* Aumenta el espacio inferior del panel blanco */
+}
+
+.admin-panel-container.compact {
+  min-height: unset;
+  height: auto;
+  max-width: 450px;
+  min-width: 100px;
+  padding: 10px 14px 2px 22px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+}
+
+.admin-panel-container:not(.compact) {
+  padding-bottom: 40px; 
+  padding-top: 40px;    
+  min-height: 400px;
+  
+}
+
+.admin-panel-center {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-panel-title {
+  text-align: center;
+  margin-bottom: 32px;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.admin-panel-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  max-width: 420px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.admin-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 18px;
+  transition: background 0.2s, color 0.2s;
+}
+.admin-btn.crear { background: #e6f9ed; color: #2563eb; }
+.admin-btn.borrar { background: #fdeaea; color: #e74c3c; }
+.admin-btn.actualizar { background: #e6f9ed; color: #198754; }
+.admin-btn.crear.active { background: #2563eb; color: #fff; }
+.admin-btn.borrar.active { background: #e74c3c; color: #fff; }
+.admin-btn.actualizar.active { background: #198754; color: #fff; }
+
+.admin-section {
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+.admin-section-title {
+  font-weight: 600;
+  margin-bottom: 18px;
+  font-family: inherit;
+  font-size: 24px;
+  display: none; /* Oculta el título "Crear", "Borrar", "Actualizar" */
+}
+.admin-section-title.crear { color: #2563eb; }
+.admin-section-title.borrar { color: #e74c3c; }
+.admin-section-title.actualizar { color: #198754; }
+
+.admin-form-block {
+  margin-bottom: 24px;
+}
+
+.admin-form-title {
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #444;
+  font-family: inherit;
+}
+
+.admin-message {
+  color: #fff;
+  background: #198754;
+  border-radius: 8px;
+  padding: 10px 18px;
+  margin-bottom: 18px;
+  font-weight: 700;
+  text-align: center;
+  font-size: 16px;
+  transition: all 0.3s;
+}
+.admin-message.error {
+  background: #e74c3c;
+}
+
+@keyframes adminPanelFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.97);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-8px) scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.admin-section-anim {
+  animation: adminPanelFadeIn 0.7s cubic-bezier(.4,0,.2,1);
+  will-change: opacity, transform;
+}
+
+.admin-panel-bg {
+  min-height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  background-image: url('./src/sources/terminal.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.admin-action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f4f8ff;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(37,99,235,0.08);
+  padding: 14px 14px 8px 14px;
+  min-width: 80px;
+  min-height: 80px;
+  margin-bottom: 0;
+  transition: box-shadow 0.2s, transform 0.2s;
+  border: 1.5px solid #e0e7ef;
+}
+.admin-action-card:hover {
+  box-shadow: 0 8px 32px rgba(37,99,235,0.13), 0 2px 12px rgba(0,0,0,0.10);
+  transform: translateY(-4px) scale(1.04) rotate(-2deg);
+  background: #eaf1fb;
+}
+.admin-action-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  margin-bottom: 6px;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+}
+.admin-action-icon svg {
+  width: 40px;
+  height: 40px;
+}
+.admin-action-label {
+  font-weight: 600;
+  color: #2563eb;
+  font-size: 12px;
+  letter-spacing: 0.2px;
+  margin-top: 0;
+}
+
+.admin-form-enhanced {
+  background: #f7fafd;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(37,99,235,0.06);
+  padding: 24px 28px 48px 28px; /* Aumenta el padding-bottom para más espacio al final */
+  margin-bottom: 18px;
+  margin-top: 8px;
+  border: 1.5px solid #e0e7ef;
+  width: 100%;
+  max-width: 600px;
+  min-width: 0;
+  margin-left: auto;
+  margin-right: auto;
+  animation: adminPanelFadeIn 0.7s cubic-bezier(.4,0,.2,1);
+  max-height: none;
+  overflow-y: visible;
+  box-sizing: border-box;
+  /* Elimina scroll y permite que el bloque crezca según el contenido */
+  padding-bottom: 48px; /* Mantén o aumenta el padding inferior del formulario */
+}
+.admin-form-title {
+  display: none;
+}
+.admin-form-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+}
+.admin-form-desc {
+  color: #555;
+  font-size: 15px;
+  margin-bottom: 16px;
+  margin-top: 2px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.admin-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.admin-form-btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-weight: 600;
+  font-size: 16px;
+  margin-top: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.admin-form-btn:hover {
+  background: #1749b1;
+}
+
+.admin-section > div[style*="display: flex"][style*="gap: 24px"] {
+  margin-bottom: 0 !important; /* Quita el espacio inferior de los botones */
+  margin-top: -18px !important; /* Sube los botones más arriba */
+  margin-top: 0 !important;
+}

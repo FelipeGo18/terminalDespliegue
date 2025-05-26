@@ -1,0 +1,26 @@
+/* header.css */
+
+/* Estilos para el header */
+.custom-header {
+  background-color: var(--color-soft);
+  padding: 20px 20px;
+  border: 0.1px solid var(--color-lime);
+}
+
+/* Contenedor del contenido del header */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Logo */
+.logo {
+  height: 60px;
+}
+
+/* Grupo de botones */
+.button-group {
+  display: flex;
+  gap: 15px;
+}

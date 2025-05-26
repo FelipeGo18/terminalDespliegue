@@ -1,0 +1,223 @@
+### Crear un nuevo rol
+POST http://localhost:4004/api/roles
+Content-Type: application/json
+
+{
+  "nombre": "agencias"
+}
+
+### Crear un nuevo rol
+POST http://localhost:4004/api/roles
+Content-Type: application/json
+
+{
+  "nombre": "admin"
+}
+
+### Crear un nuevo usuario
+POST http://localhost:4004/api/usuarios
+Content-Type: application/json
+
+{
+  "nombre": "Nuevo Usuario",
+  "email":"nuevousuario@example.com",
+  "contraseña": "password123",
+  "rol_id": 1
+}
+
+### obtener roles
+GET http://localhost:4004/api/roles
+
+### Crear una nueva empresa
+POST http://localhost:4004/api/empresas Content-Type: application/json { "nombre": "Flota La Macarena"}
+
+### Crear una nueva empresa
+POST http://localhost:4004/api/empresas
+Content-Type: application/json
+
+{
+  "nombre": "Copetran"
+}
+
+### Crear una nueva empresa
+POST http://localhost:4004/api/empresas
+Content-Type: application/json
+
+{
+  "nombre": "Rápio del carmen"
+}
+
+### Crear una nueva empresa
+POST http://localhost:4004/api/empresas
+Content-Type: application/json
+
+{
+  "nombre": "arizona"
+}
+
+### Crear una nueva empresa
+POST http://localhost:4004/api/empresas
+Content-Type: application/json
+
+{
+  "nombre": "Coomotor"
+}
+
+### Crear una nueva empresa
+POST http://localhost:4004/api/empresas
+Content-Type: application/json
+
+{
+  "nombre": "Velotax"
+}
+
+### Crear una nueva ruta
+POST http://localhost:4004/api/rutas
+Content-Type: application/json
+
+{
+  "origen": "Bogotá",
+  "destino": "Medellín",
+  "distancia_km": 400.00,
+  "duracion_estimada": "5 hours",
+  "precio": 100000
+}
+
+### Crear una nueva ruta
+POST http://localhost:4004/api/rutas
+Content-Type: application/json
+
+{
+  "origen": "Cali",
+  "destino": "Cartagena",
+  "distancia_km": 600.00,
+  "duracion_estimada": "10 hours",
+  "precio": 150000
+}
+
+### Crear un nuevo bus
+POST http://localhost:4004/api/buses
+Content-Type: application/json
+
+{
+  "numero_bus": "101",
+  "conductor": "Carlos Pérez",
+  "empresa_id": 1
+}
+
+### Crear un nuevo bus para la ruta Bogotá → Medellín
+POST http://localhost:4004/api/buses
+Content-Type: application/json
+
+{
+  "numero_bus": "102",
+  "conductor": "Ana Gómez",
+  "empresa_id": 1
+}
+
+### Crear un nuevo bus para la ruta Cali → Cartagena
+POST http://localhost:4004/api/buses
+Content-Type: application/json
+
+{
+  "numero_bus": "201",
+  "conductor": "Luis Martínez",
+  "empresa_id": 2
+}
+
+### Crear un nuevo bus para la ruta Cali → Cartagena
+POST http://localhost:4004/api/buses
+Content-Type: application/json
+
+{
+  "numero_bus": "202",
+  "conductor": "María López",
+  "empresa_id": 2
+}
+
+### Crear un viaje para la ruta Bogotá → Medellín
+POST http://localhost:4004/api/viajes
+Content-Type: application/json
+
+{
+  "bus_id": 1,
+  "ruta_id": 1,
+  "salida": "2025-05-10T08:00:00",
+  "llegada": "2025-05-10T12:00:00"
+}
+
+
+### Crear un nuevo bus
+POST http://localhost:4004/api/buses
+Content-Type: application/json
+
+{
+  "numero_bus": "103",
+  "conductor": "Pedro Gómez",
+  "empresa_id": 1
+}
+
+
+### Crear un viaje para la ruta Bogotá → Medellín
+POST http://localhost:4004/api/viajes
+Content-Type: application/json
+
+{
+  "bus_id": 5,  // Cambia el ID según el bus creado
+  "ruta_id": 1,
+  "salida": "2025-05-12T08:00:00",
+  "llegada": "2025-05-12T12:00:00"
+}
+
+### Crear un viaje para la ruta Bogotá → Medellín
+POST http://localhost:4004/api/viajes
+Content-Type: application/json
+
+{
+  "bus_id": 2,
+  "ruta_id": 1,
+  "salida": "2025-05-11T09:00:00",
+  "llegada": "2025-05-11T13:00:00"
+}
+
+### Crear un viaje para la ruta Cali → Cartagena
+POST http://localhost:4004/api/viajes
+Content-Type: application/json
+
+{
+  "bus_id": 3,
+  "ruta_id": 2,
+  "salida": "2025-06-01T07:00:00",
+  "llegada": "2025-06-01T17:00:00"
+}
+
+### Crear un viaje para la ruta Cali → Cartagena
+POST http://localhost:4004/api/viajes
+Content-Type: application/json
+
+{
+  "bus_id": 4,
+  "ruta_id": 2,
+  "salida": "2025-06-02T08:00:00",
+  "llegada": "2025-06-02T18:00:00"
+}
+
+### ver bus ruta 1
+GET http://localhost:4004/api/buses/ruta/1
+
+### ver bus ruta 2
+GET http://localhost:4004/api/buses/ruta/2
+
+
+### Crear un nuevo ticket
+POST http://localhost:4004/api/tickets
+Content-Type: application/json
+
+{
+  "usuario_id": 2,
+  "viaje_id": 1,
+  "asiento": "A23"
+}
+
+### obtener origen-destino
+GET http://localhost:4004/api/buses/origen-destino?origen=Cali&destino=Cartagena

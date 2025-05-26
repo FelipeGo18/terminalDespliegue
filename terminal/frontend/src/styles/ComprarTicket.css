@@ -1,0 +1,108 @@
+/* Contenedor principal */
+.ticket-container {
+  max-width: 600px;
+  padding: 30px;
+  border-radius: 15px;
+  background: linear-gradient(to bottom, #ADD8E6, #ffffff); /* Fondo degradado azul claro */
+  border: 4px solid #005f8b;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  margin: auto;
+  margin-top: 60px;
+}
+
+/* Título */
+.ticket-title {
+  color: #005f8b;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 25px;
+}
+
+/* Información general */
+.ticket-info {
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: #003d62;
+}
+
+/* Formulario */
+.ticket-form {
+  margin-top: 20px;
+}
+
+.ticket-input {
+  padding: 12px;
+  border-radius: 10px;
+  border: 2px solid #005f8b;
+  width: 80%;
+  font-size: 16px;
+}
+
+/* Botón de compra */
+.ticket-button {
+  background-color: #007bff;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.ticket-button:hover {
+  background-color: #005f8b;
+}
+
+/* Contenedor de detalles del ticket */
+.ticket-details {
+  margin-top: 25px;
+  border: 2px solid #007bff;
+  padding: 25px;
+  border-radius: 12px;
+  background-color: #e0f7ff;
+}
+
+/* QR del ticket */
+.qr-container img {
+  max-width: 150px;
+  margin-top: 10px;
+}
+
+/* Botones de navegación */
+.navigation-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.nav-button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* Botón verde */
+.green {
+  background-color: #28a745;
+  color: white;
+}
+
+.green:hover {
+  background-color: #218838;
+}
+
+/* Botón gris */
+.gray {
+  background-color: #6c757d;
+  color: white;
+}
+
+.gray:hover {
+  background-color: #5a6268;
+}
