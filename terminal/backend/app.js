@@ -56,6 +56,10 @@ app.get('/api/protected', authenticateToken, (req, res) => {
   res.json({ message: 'Acceso autorizado', user: req.user });
 });
 
+app.use(cors({
+  origin: "https://terminaldespliegue.onrender.com",
+  credentials: true
+}));
 // Mapa para almacenar la última ubicación de cada bus y el tiempo de expiración
 const busLocations = {}; // { [busId]: { lat, lng, timestamp, expiresAt } }
 

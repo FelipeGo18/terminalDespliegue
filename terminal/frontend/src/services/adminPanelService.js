@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const ADMIN_PANEL_API_URL = 'http://localhost:5000/api';
+const ADMIN_PANEL_API_URL = 'https://terminaldespliegue.onrender.com/api';
 
 export const getBusesFromAdminPanel = async () => {
   const response = await axios.get(`${ADMIN_PANEL_API_URL}/buses`);
