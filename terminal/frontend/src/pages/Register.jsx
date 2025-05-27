@@ -44,7 +44,7 @@ const Register = () => {
     setVerifyLoading(true);
     setVerifyMsg('');
     try {
-      await fetch('http://localhost:4004/api/usuarios/enviar-codigo', {
+      await fetch('https://terminaldespliegue.onrender.com/api/usuarios/enviar-codigo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: verifyEmail })
@@ -63,7 +63,7 @@ const Register = () => {
     setVerifyLoading(true);
     setVerifyMsg('');
     try {
-      await fetch('http://localhost:4004/api/usuarios/verificar-codigo', {
+      await fetch('https://terminaldespliegue.onrender.com/verificar-codigo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: verifyEmail, code: verifyCode })

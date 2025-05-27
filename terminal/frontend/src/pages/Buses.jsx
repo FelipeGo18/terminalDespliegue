@@ -15,14 +15,23 @@ function Buses() {
     const fetchEmpresas = async () => {
       try {
         const data = await getEmpresas();
-        if (data.length > 0) {
+        if (Array.isArray(data)) {
           setEmpresas(data);
-          setMensaje("");
+          if (data.length === 0) {
+            setMensaje("No hay empresas registradas.");
+          } else {
+            setMensaje(""); // Clear message if there are empresas
+          }
         } else {
-          setMensaje("No hay empresas registradas.");
+          // If data is not an array, it's an unexpected format
+          setEmpresas([]); // Fallback to an empty array to prevent .map error
+          setMensaje("Error: Los datos de empresas recibidos no son válidos.");
+          console.error("getEmpresas() did not return an array. Received:", data);
         }
       } catch (error) {
+        setEmpresas([]); // Fallback to an empty array on any error during fetch
         setMensaje("Hubo un error al cargar las empresas.");
+        console.error("Error fetching empresas:", error);
       }
     };
     fetchEmpresas();

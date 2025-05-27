@@ -199,14 +199,6 @@ router.post('/usuarios/login', async (req, res) => {
             return res.status(401).json({ error: 'Usuario no verificado. Por favor, verifica tu correo electrónico.' });
         }
 
-        // Defensive check for a valid password hash from the database
-        if (!usuario.contraseña || typeof usuario.contraseña !== 'string' || usuario.contraseña.trim() === '') {
-            console.error(`Error al iniciar sesión: El usuario con email ${email} no tiene una contraseña válida almacenada en la base de datos.`);
-            // It's crucial not to reveal to the client whether the email exists or if the password is just missing/invalid for security reasons.
-            // So, we return a generic credentials error, but log the specific issue on the server.
-            return res.status(401).json({ error: 'Credenciales incorrectas' }); 
-        }
-
         const contraseñaValida = await bcrypt.compare(contraseña, usuario.contraseña);
         if (!contraseñaValida) {
             return res.status(401).json({ error: 'Credenciales incorrectas' });

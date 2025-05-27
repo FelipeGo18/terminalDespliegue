@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://terminaldespliegue.onrender.com';
+const API_BASE_URL = 'https://terminaldespliegue.onrender.com/api';
 
 // Obtener todas las rutas
 export const getRutas = async () => {

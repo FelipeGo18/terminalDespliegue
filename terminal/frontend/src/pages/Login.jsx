@@ -65,7 +65,7 @@ const Login = () => {
     setRecoveryLoading(true);
     setRecoveryMsg('');
     try {
-      await axios.post('http://localhost:4004/api/usuarios/enviar-recuperacion', { email: recoveryEmail });
+      await axios.post('https://terminaldespliegue.onrender.com/api/usuarios/enviar-recuperacion', { email: recoveryEmail });
       setRecoveryMsg('Enlace de recuperación enviado. Revisa tu correo.');
     } catch (err) {
       setRecoveryMsg('No se pudo enviar el enlace. ¿El correo está registrado y verificado?');
