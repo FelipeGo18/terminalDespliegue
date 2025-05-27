@@ -1,0 +1,11 @@
+{
+  "name": "fullstack-app",
+  "scripts": {
+    "build": "cd terminal/frontend && npm install && npm run build",
+    "start": "cd terminal/backend && npm install && node app.js"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.4.1",
+    "vite": "^4.4.9"
+  }
+}
