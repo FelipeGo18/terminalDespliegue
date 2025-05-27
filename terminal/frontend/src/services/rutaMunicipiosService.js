@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://terminaldespliegue.onrender.com/api';
+const API_BASE_URL = 'https://terminaldespliegue.onrender.com';
 
 // Obtener todas las relaciones ruta-municipio
 export const getRutaMunicipios = async () => {

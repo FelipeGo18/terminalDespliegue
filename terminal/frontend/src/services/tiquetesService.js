@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'https://terminaldespliegue.onrender.com/api';
+const API_BASE_URL = 'https://terminaldespliegue.onrender.com';
 
 // Obtener todos los tickets
 export const getTickets = async () => {
