@@ -1,3 +1,4 @@
+require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
@@ -8,8 +9,20 @@ const server = http.createServer(app);
 const { Server } = require('socket.io');
 const io = new Server(server, {
   cors: {
-    origin: '*', // Ajusta según tus necesidades de seguridad
-    methods: ['GET', 'POST']
+    origin: function (origin, callback) {
+      const allowedOrigins = [
+        'http://localhost:10301', 
+        'http://localhost:5000', 
+        process.env.FRONTEND_URL || 'https://terminaldespliegue.onrender.com'
+      ];
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'POST'],
+    credentials: true // Important for cookies/sessions if you use them
   }
 });
 
@@ -25,16 +38,37 @@ const buses = require('./routes/buses');
 const rutasMunicipio = require('./routes/rutas_municipio');
 
 // Middlewares
-app.use(cors({ origin: ['http://localhost:10301', 'http://localhost:5000'] })); // Permitir múltiples orígenes
+// Consolidated CORS setup - place before API routes
+const allowedOrigins = [
+  'http://localhost:10301',
+  'http://localhost:5000',
+  process.env.FRONTEND_URL || 'https://terminaldespliegue.onrender.com'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json()); // Para poder leer JSON en las peticiones
 
 // Middleware para verificar el token JWT
 const authenticateToken = (req, res, next) => {
-  const token = req.headers['authorization'];
-  if (!token) return res.status(401).json({ error: 'Acceso denegado' });
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Expecting "Bearer TOKEN"
 
-  jwt.verify(token, 'SECRET_KEY', (err, user) => {
-    if (err) return res.status(403).json({ error: 'Token inválido' });
+  if (!token) return res.status(401).json({ error: 'Acceso denegado. Token no proporcionado.' });
+
+  jwt.verify(token, process.env.JWT_SECRET || 'your_default_jwt_secret', (err, user) => {
+    if (err) {
+      console.error("JWT verification error:", err.message);
+      return res.status(403).json({ error: 'Token inválido o expirado' });
+    }
     req.user = user;
     next();
   });
@@ -56,10 +90,6 @@ app.get('/api/protected', authenticateToken, (req, res) => {
   res.json({ message: 'Acceso autorizado', user: req.user });
 });
 
-app.use(cors({
-  origin: "https://terminaldespliegue.onrender.com",
-  credentials: true
-}));
 // Mapa para almacenar la última ubicación de cada bus y el tiempo de expiración
 const busLocations = {}; // { [busId]: { lat, lng, timestamp, expiresAt } }
 
@@ -113,7 +143,7 @@ app.get(/.*/, (req, res) => {
 });
 
 // Puerto
-const PORT = 4004;
+const PORT = process.env.PORT || 4004; // Use Render's port or fallback
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor backend en http://localhost:${PORT}`);
   console.log(`Socket.io corriendo en el mismo puerto`);
