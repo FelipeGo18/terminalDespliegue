@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const app = express();
+const path = require("path");
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require('socket.io');
