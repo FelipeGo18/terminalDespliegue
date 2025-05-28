@@ -7,21 +7,20 @@ router.use(express.json()); // Middleware para parsear JSON
 // Obtener todos los viajes
 router.get('/viajes', async (req, res) => {
     try {
-        const result = await db.query(
-            `SELECT v.id, v.salida, v.llegada, v.precio, 
-                    b.numero_bus, u_cond.nombre as conductor_nombre, 
-                    r.origen, r.destino,
-                    e.nombre as empresa_nombre,
-                    b.cat_asientos,
-                    (SELECT COUNT(*) FROM tickets t WHERE t.viaje_id = v.id) as tickets_ocupados
+        db.all(
+            `SELECT v.id, v.salida, v.llegada, v.precio, b.numero_bus, b.conductor, r.origen, r.destino
              FROM viajes v
              JOIN buses b ON v.bus_id = b.id
-             JOIN rutas r ON v.ruta_id = r.id
-             JOIN empresas e ON b.empresa_id = e.id
-             LEFT JOIN usuarios u_cond ON b.conductor_id = u_cond.id
-             ORDER BY v.salida`
+             JOIN rutas r ON v.ruta_id = r.id`,
+            [],
+            (err, rows) => {
+                if (err) {
+                    console.error('Error al obtener los viajes:', err);
+                    return res.status(500).json({ error: 'Error al obtener los viajes' });
+                }
+                res.json(rows);
+            }
         );
-        res.json(result.rows);
     } catch (error) {
         console.error('Error al obtener los viajes:', error);
         res.status(500).json({ error: 'Error al obtener los viajes' });
@@ -31,7 +30,7 @@ router.get('/viajes', async (req, res) => {
 // Obtener todos los viajes con información del bus y la ruta
 router.get('/viajes-con-bus', async (req, res) => {
     try {
-        const result = await db.query(
+        db.all(
             `SELECT 
                 v.id AS viaje_id,
                 v.salida,
@@ -40,20 +39,22 @@ router.get('/viajes-con-bus', async (req, res) => {
                 v.bus_id,
                 v.ruta_id,
                 b.numero_bus,
-                u_cond.nombre as conductor_nombre,
+                b.conductor,
                 b.cat_asientos,
-                (SELECT COUNT(*) FROM tickets t WHERE t.viaje_id = v.id) as tickets_ocupados,
                 r.origen,
-                r.destino,
-                e.nombre as empresa_nombre
+                r.destino
             FROM viajes v
             JOIN buses b ON v.bus_id = b.id
-            JOIN rutas r ON v.ruta_id = r.id
-            JOIN empresas e ON b.empresa_id = e.id
-            LEFT JOIN usuarios u_cond ON b.conductor_id = u_cond.id
-            ORDER BY v.salida`
+            JOIN rutas r ON v.ruta_id = r.id`,
+            [],
+            (err, rows) => {
+                if (err) {
+                    console.error('Error al obtener los viajes con bus:', err);
+                    return res.status(500).json({ error: 'Error al obtener los viajes con bus' });
+                }
+                res.json(rows);
+            }
         );
-        res.json(result.rows);
     } catch (error) {
         console.error('Error al obtener los viajes con bus:', error);
         res.status(500).json({ error: 'Error al obtener los viajes con bus' });
@@ -64,26 +65,24 @@ router.get('/viajes-con-bus', async (req, res) => {
 router.get('/viajes/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        const result = await db.query(
-            `SELECT v.id, v.salida, v.llegada, v.precio,
-                    b.numero_bus, u_cond.nombre as conductor_nombre, 
-                    r.origen, r.destino,
-                    e.nombre as empresa_nombre,
-                    b.cat_asientos,
-                    (SELECT COUNT(*) FROM tickets t WHERE t.viaje_id = v.id) as tickets_ocupados
+        db.get(
+            `SELECT v.id, v.salida, v.llegada, b.numero_bus, b.conductor, r.origen, r.destino
              FROM viajes v
              JOIN buses b ON v.bus_id = b.id
              JOIN rutas r ON v.ruta_id = r.id
-             JOIN empresas e ON b.empresa_id = e.id
-             LEFT JOIN usuarios u_cond ON b.conductor_id = u_cond.id
-             WHERE v.id = $1`,
-            [id]
+             WHERE v.id = ?`,
+            [id],
+            (err, row) => {
+                if (err) {
+                    console.error('Error al obtener el viaje:', err);
+                    return res.status(500).json({ error: 'Error al obtener el viaje' });
+                }
+                if (!row) {
+                    return res.status(404).json({ error: 'Viaje no encontrado' });
+                }
+                res.json(row);
+            }
         );
-        if (result.rows.length === 0) {
-            res.status(404).json({ error: 'Viaje no encontrado' });
-        } else {
-            res.json(result.rows[0]);
-        }
     } catch (error) {
         console.error('Error al obtener el viaje:', error);
         res.status(500).json({ error: 'Error al obtener el viaje' });
@@ -94,20 +93,19 @@ router.get('/viajes/:id', async (req, res) => {
 router.get('/viajes/ruta/:rutaId', async (req, res) => {
     const { rutaId } = req.params;
     try {
-        const result = await db.query(
-            `SELECT v.id, v.salida, v.llegada, v.precio, v.bus_id, v.ruta_id, 
-                    b.numero_bus, u_cond.nombre as conductor_nombre, b.cat_asientos,
-                    (SELECT COUNT(*) FROM tickets t WHERE t.viaje_id = v.id) as tickets_ocupados,
-                    e.nombre as empresa_nombre
+        db.all(
+            `SELECT v.id, v.salida, v.llegada, v.precio, v.bus_id, v.ruta_id
              FROM viajes v
-             JOIN buses b ON v.bus_id = b.id
-             LEFT JOIN usuarios u_cond ON b.conductor_id = u_cond.id
-             JOIN empresas e ON b.empresa_id = e.id
-             WHERE v.ruta_id = $1
-             ORDER BY v.salida`,
-            [rutaId]
+             WHERE v.ruta_id = ?`,
+            [rutaId],
+            (err, rows) => {
+                if (err) {
+                    console.error('Error al obtener los viajes por ruta:', err);
+                    return res.status(500).json({ error: 'Error al obtener los viajes por ruta' });
+                }
+                res.json(rows);
+            }
         );
-        res.json(result.rows);
     } catch (error) {
         console.error('Error al obtener los viajes por ruta:', error);
         res.status(500).json({ error: 'Error al obtener los viajes por ruta' });
@@ -118,23 +116,21 @@ router.get('/viajes/ruta/:rutaId', async (req, res) => {
 router.get('/viajes/empresa/:empresaId', async (req, res) => {
     const { empresaId } = req.params;
     try {
-        const result = await db.query(
-            `SELECT v.id, v.salida, v.llegada, v.precio, 
-                    b.numero_bus, u_cond.nombre as conductor_nombre, 
-                    r.origen, r.destino,
-                    e.nombre as empresa_nombre,
-                    b.cat_asientos,
-                    (SELECT COUNT(*) FROM tickets t WHERE t.viaje_id = v.id) as tickets_ocupados
+        db.all(
+            `SELECT v.id, v.salida, v.llegada, v.precio, b.numero_bus, b.conductor, r.origen, r.destino
              FROM viajes v
              JOIN buses b ON v.bus_id = b.id
              JOIN rutas r ON v.ruta_id = r.id
-             JOIN empresas e ON b.empresa_id = e.id
-             LEFT JOIN usuarios u_cond ON b.conductor_id = u_cond.id
-             WHERE b.empresa_id = $1
-             ORDER BY v.salida`,
-            [empresaId]
+             WHERE b.empresa_id = ?`,
+            [empresaId],
+            (err, rows) => {
+                if (err) {
+                    console.error('Error al obtener los viajes por empresa:', err);
+                    return res.status(500).json({ error: 'Error al obtener los viajes por empresa' });
+                }
+                res.json(rows);
+            }
         );
-        res.json(result.rows);
     } catch (error) {
         console.error('Error al obtener los viajes por empresa:', error);
         res.status(500).json({ error: 'Error al obtener los viajes por empresa' });
@@ -145,33 +141,63 @@ router.get('/viajes/empresa/:empresaId', async (req, res) => {
 router.post('/viajes', async (req, res) => {
     const { bus_id, ruta_id, salida, llegada, precio } = req.body;
 
-    if (!bus_id || !ruta_id || !salida || !llegada || precio === undefined) {
-        return res.status(400).json({ error: 'Faltan campos obligatorios: bus_id, ruta_id, salida, llegada, precio.' });
-    }
-
     try {
         // Verificar si el bus existe
-        const busResult = await db.query('SELECT id FROM buses WHERE id = $1', [bus_id]);
-        if (busResult.rows.length === 0) {
-            return res.status(400).json({ error: 'El bus especificado no existe.' });
+        const busResult = await new Promise((resolve, reject) => {
+            db.get('SELECT * FROM buses WHERE id = ?', [bus_id], (err, row) => {
+                if (err) reject(err);
+                resolve(row);
+            });
+        });
+
+        if (!busResult) {
+            return res.status(400).json({ error: 'El bus no existe' });
         }
 
-        // Verificar si la ruta existe
-        const rutaResult = await db.query('SELECT id FROM rutas WHERE id = $1', [ruta_id]);
-        if (rutaResult.rows.length === 0) {
-            return res.status(400).json({ error: 'La ruta especificada no existe.' });
+        // Verificar si la ruta existe y obtener datos
+        const rutaResult = await new Promise((resolve, reject) => {
+            db.get('SELECT * FROM rutas WHERE id = ?', [ruta_id], (err, row) => {
+                if (err) reject(err);
+                resolve(row);
+            });
+        });
+
+        if (!rutaResult) {
+            return res.status(400).json({ error: 'La ruta no existe' });
         }
 
-        // Validar que la fecha de salida sea anterior a la fecha de llegada
-        if (new Date(salida) >= new Date(llegada)) {
-            return res.status(400).json({ error: 'La fecha de salida debe ser anterior a la fecha de llegada.' });
+        // Si el precio viene en el body, úsalo (precio fijo de la ruta principal)
+        let precioFinal = precio;
+        if (precioFinal === undefined || precioFinal === null || isNaN(Number(precioFinal))) {
+            // Si no viene, intenta calcularlo como antes (para compatibilidad)
+            // Busca el municipio de origen
+            const municipioOrigen = await new Promise((resolve, reject) => {
+                db.get('SELECT * FROM municipios WHERE nombre = ?', [rutaResult.origen], (err, row) => {
+                    if (err) reject(err);
+                    resolve(row);
+                });
+            });
+
+            if (!municipioOrigen) {
+                return res.status(400).json({ error: 'No se encontró el municipio de origen para la tarifa' });
+            }
+
+            const tarifaKm = municipioOrigen.tarifa_km;
+            const distancia = rutaResult.distancia_km;
+            precioFinal = distancia * tarifaKm;
         }
 
-        const result = await db.query(
-            'INSERT INTO viajes (bus_id, ruta_id, salida, llegada, precio) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [bus_id, ruta_id, salida, llegada, precio]
+        db.run(
+            'INSERT INTO viajes (bus_id, ruta_id, salida, llegada, precio) VALUES (?, ?, ?, ?, ?)',
+            [bus_id, ruta_id, salida, llegada, precioFinal],
+            function (err) {
+                if (err) {
+                    console.error('Error al crear el viaje:', err);
+                    return res.status(500).json({ error: 'Error al crear el viaje' });
+                }
+                res.status(201).json({ id: this.lastID, bus_id, ruta_id, salida, llegada, precio: precioFinal });
+            }
         );
-        res.status(201).json(result.rows[0]);
     } catch (error) {
         console.error('Error al crear el viaje:', error);
         res.status(500).json({ error: 'Error al crear el viaje' });
@@ -180,59 +206,97 @@ router.post('/viajes', async (req, res) => {
 
 // Calcular precio de un tramo intermedio (no crea viaje, solo devuelve el precio)
 router.post('/viajes/tramo', async (req, res) => {
-    const { ruta_id, origen_municipio_id, destino_municipio_id } = req.body;
-
-    if (!ruta_id || !origen_municipio_id || !destino_municipio_id) {
-        return res.status(400).json({ error: 'ruta_id, origen_municipio_id y destino_municipio_id son obligatorios.' });
-    }
-
-    if (origen_municipio_id === destino_municipio_id) {
-        return res.status(400).json({ error: 'El municipio de origen y destino no pueden ser el mismo.' });
-    }
-
+    const { ruta_id, origen_municipio, destino_municipio } = req.body;
     try {
-        const rutaQuery = await db.query('SELECT * FROM rutas WHERE id = $1', [ruta_id]);
-        if (rutaQuery.rows.length === 0) {
-            return res.status(404).json({ error: 'Ruta no encontrada.' });
-        }
-
-        const origenTramoQuery = await db.query(
-            'SELECT rm.orden, m.tarifa_km, m.nombre FROM ruta_municipios rm JOIN municipios m ON rm.municipio_id = m.id WHERE rm.ruta_id = $1 AND rm.municipio_id = $2',
-            [ruta_id, origen_municipio_id]
-        );
-        const destinoTramoQuery = await db.query(
-            'SELECT rm.orden, m.tarifa_km, m.nombre FROM ruta_municipios rm JOIN municipios m ON rm.municipio_id = m.id WHERE rm.ruta_id = $1 AND rm.municipio_id = $2',
-            [ruta_id, destino_municipio_id]
-        );
-
-        if (origenTramoQuery.rows.length === 0 || destinoTramoQuery.rows.length === 0) {
-            return res.status(404).json({ error: 'Uno o ambos municipios no se encuentran en la ruta especificada.' });
-        }
-
-        const origenTramo = origenTramoQuery.rows[0];
-        const destinoTramo = destinoTramoQuery.rows[0];
-
-        if (origenTramo.orden >= destinoTramo.orden) {
-            return res.status(400).json({ error: 'El municipio de origen debe tener un orden menor al municipio de destino en la ruta.' });
-        }
-
-        const numeroDeSegmentos = destinoTramo.orden - origenTramo.orden;
-        const tarifaKmOrigen = parseFloat(origenTramo.tarifa_km);
-        // This is a placeholder, assuming an average of 10km per segment between municipalities in a route.
-        // A more accurate system would store the actual distance between consecutive municipalities in the `ruta_municipios` table or a similar structure.
-        const distanciaEstimadaTramo = numeroDeSegmentos * 10; 
-        const precioCalculado = distanciaEstimadaTramo * tarifaKmOrigen;
-
-        res.json({
-            ruta_id,
-            origen_municipio: { id: origen_municipio_id, nombre: origenTramo.nombre, orden: origenTramo.orden },
-            destino_municipio: { id: destino_municipio_id, nombre: destinoTramo.nombre, orden: destinoTramo.orden },
-            precio_calculado: precioCalculado.toFixed(2),
-            mensaje: "Precio calculado es una estimación basada en el número de segmentos y tarifa del municipio de origen. La distancia por segmento es un placeholder (10km)."
+        // 1. Obtener orden de origen y destino en la ruta
+        const ordenes = await new Promise((resolve, reject) => {
+            db.all(
+                `SELECT rm.orden, m.nombre
+                 FROM ruta_municipios rm
+                 JOIN municipios m ON m.id = rm.municipio_id
+                 WHERE rm.ruta_id = ? AND (LOWER(TRIM(m.nombre)) = LOWER(?) OR LOWER(TRIM(m.nombre)) = LOWER(?))
+                 ORDER BY rm.orden ASC`,
+                [ruta_id, origen_municipio, destino_municipio],
+                (err, rows) => {
+                    if (err) reject(err);
+                    else resolve(rows);
+                }
+            );
         });
 
+        if (!ordenes || ordenes.length < 2) {
+            return res.status(400).json({ error: 'No se encontraron ambos municipios en la ruta' });
+        }
+
+        const ordenOrigen = ordenes.find(o => o.nombre.toLowerCase().trim() === origen_municipio.toLowerCase().trim());
+        const ordenDestino = ordenes.find(o => o.nombre.toLowerCase().trim() === destino_municipio.toLowerCase().trim());
+
+        // 2. Obtener municipios intermedios
+        const municipiosTramo = await new Promise((resolve, reject) => {
+            db.all(
+                `SELECT m.*, rm.orden
+                 FROM ruta_municipios rm
+                 JOIN municipios m ON m.id = rm.municipio_id
+                 WHERE rm.ruta_id = ?
+                   AND rm.orden >= ?
+                   AND rm.orden <= ?
+                 ORDER BY rm.orden ASC`,
+                [
+                    ruta_id,
+                    Math.min(ordenOrigen.orden, ordenDestino.orden),
+                    Math.max(ordenOrigen.orden, ordenDestino.orden)
+                ],
+                (err, rows) => {
+                    if (err) reject(err);
+                    else resolve(rows);
+                }
+            );
+        });
+
+        // 3. Calcular distancia proporcional
+        const rutaResult = await new Promise((resolve, reject) => {
+            db.get('SELECT * FROM rutas WHERE id = ?', [ruta_id], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+
+        const totalMunicipiosRuta = await new Promise((resolve, reject) => {
+            db.get(
+                `SELECT COUNT(*) as total FROM ruta_municipios WHERE ruta_id = ?`,
+                [ruta_id],
+                (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row.total);
+                }
+            );
+        });
+
+        const tramos = municipiosTramo.length - 1;
+        const distanciaTramo = (rutaResult.distancia_km && totalMunicipiosRuta > 1)
+            ? (rutaResult.distancia_km * tramos) / (totalMunicipiosRuta - 1)
+            : 0;
+
+        // 4. Tarifa del municipio de origen
+        const municipioOrigen = await new Promise((resolve, reject) => {
+            db.get(
+                'SELECT tarifa_km FROM municipios WHERE LOWER(TRIM(nombre)) = LOWER(?)',
+                [origen_municipio],
+                (err, row) => {
+                    if (err) reject(err);
+                    else resolve(row);
+                }
+            );
+        });
+
+        if (!municipioOrigen) {
+            return res.status(400).json({ error: 'No se encontró el municipio de origen para la tarifa' });
+        }
+
+        // 5. Calcular precio
+        const precio = Math.round(Number(distanciaTramo) * Number(municipioOrigen.tarifa_km));
+        res.json({ precio, distancia_km: distanciaTramo });
     } catch (error) {
-        console.error('Error al calcular el precio del tramo:', error);
         res.status(500).json({ error: 'Error al calcular el precio del tramo' });
     }
 });
@@ -242,21 +306,55 @@ router.put('/viajes/:id', async (req, res) => {
     const { id } = req.params;
     const { bus_id, ruta_id, salida, llegada, precio } = req.body;
     try {
-        if (salida && llegada && new Date(salida) >= new Date(llegada)) {
-            return res.status(400).json({ error: 'La fecha de salida debe ser anterior a la fecha de llegada.' });
+        // Verifica que el viaje exista
+        const viajeExistente = await new Promise((resolve, reject) => {
+            db.get('SELECT * FROM viajes WHERE id = ?', [id], (err, row) => {
+                if (err) reject(err);
+                resolve(row);
+            });
+        });
+        if (!viajeExistente) {
+            return res.status(404).json({ error: 'Viaje no encontrado' });
         }
 
-        const result = await db.query(
-            'UPDATE viajes SET bus_id = $1, ruta_id = $2, salida = $3, llegada = $4, precio = $5 WHERE id = $6 RETURNING *',
-            [bus_id, ruta_id, salida, llegada, precio, id]
-        );
-        if (result.rowCount === 0) {
-            res.status(404).json({ error: 'Viaje no encontrado' });
-        } else {
-            res.json(result.rows[0]);
+        // Si no viene precio, recalcula automáticamente
+        let precioFinal = precio;
+        if (precioFinal === undefined || precioFinal === null || isNaN(Number(precioFinal))) {
+            // Busca la ruta y municipio de origen
+            const rutaResult = await new Promise((resolve, reject) => {
+                db.get('SELECT * FROM rutas WHERE id = ?', [ruta_id], (err, row) => {
+                    if (err) reject(err);
+                    resolve(row);
+                });
+            });
+            const municipioOrigen = await new Promise((resolve, reject) => {
+                db.get('SELECT * FROM municipios WHERE nombre = ?', [rutaResult.origen], (err, row) => {
+                    if (err) reject(err);
+                    resolve(row);
+                });
+            });
+            if (!municipioOrigen) {
+                return res.status(400).json({ error: 'No se encontró el municipio de origen para la tarifa' });
+            }
+            const tarifaKm = municipioOrigen.tarifa_km;
+            const distancia = rutaResult.distancia_km;
+            precioFinal = distancia * tarifaKm;
         }
+
+        db.run(
+            'UPDATE viajes SET bus_id = ?, ruta_id = ?, salida = ?, llegada = ?, precio = ? WHERE id = ?',
+            [bus_id, ruta_id, salida, llegada, precioFinal, id],
+            function (err) {
+                if (err) {
+                    return res.status(500).json({ error: 'Error al actualizar el viaje' });
+                } else if (this.changes === 0) {
+                    return res.status(404).json({ error: 'Viaje no encontrado' });
+                } else {
+                    res.json({ id, bus_id, ruta_id, salida, llegada, precio: precioFinal });
+                }
+            }
+        );
     } catch (error) {
-        console.error('Error al actualizar el viaje:', error);
         res.status(500).json({ error: 'Error al actualizar el viaje' });
     }
 });
@@ -264,25 +362,24 @@ router.put('/viajes/:id', async (req, res) => {
 // Eliminar un viaje por ID
 router.delete('/viajes/:id', async (req, res) => {
     const { id } = req.params;
-    const client = await db.connect();
     try {
-        await client.query('BEGIN');
-        await client.query('DELETE FROM tickets WHERE viaje_id = $1', [id]);
-        const result = await client.query('DELETE FROM viajes WHERE id = $1 RETURNING *', [id]);
-        
-        if (result.rowCount === 0) {
-            await client.query('ROLLBACK');
-            res.status(404).json({ error: 'Viaje no encontrado' });
-        } else {
-            await client.query('COMMIT');
-            res.json({ message: 'Viaje y tickets asociados eliminados', deletedViaje: result.rows[0] });
-        }
+        db.run(
+            'DELETE FROM viajes WHERE id = ?',
+            [id],
+            function (err) {
+                if (err) {
+                    console.error('Error al eliminar el viaje:', err);
+                    return res.status(500).json({ error: 'Error al eliminar el viaje' });
+                }
+                if (this.changes === 0) {
+                    return res.status(404).json({ error: 'Viaje no encontrado' });
+                }
+                res.status(200).json({ message: 'Viaje eliminado correctamente' });
+            }
+        );
     } catch (error) {
-        await client.query('ROLLBACK');
         console.error('Error al eliminar el viaje:', error);
         res.status(500).json({ error: 'Error al eliminar el viaje' });
-    } finally {
-        client.release();
     }
 });
 

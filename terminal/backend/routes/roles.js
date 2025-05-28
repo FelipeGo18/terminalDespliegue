@@ -7,10 +7,14 @@ router.use(express.json()); // Middleware para parsear JSON
 // Obtener todos los roles
 router.get('/roles', async (req, res) => {
     try {
-        const result = await db.query('SELECT * FROM roles');
-        res.json(result.rows);
+        db.all('SELECT * FROM roles', [], (err, rows) => {
+            if (err) {
+                res.status(500).json({ error: 'Error al obtener los roles' });
+            } else {
+                res.json(rows);
+            }
+        });
     } catch (error) {
-        console.error('Error al obtener los roles:', error);
         res.status(500).json({ error: 'Error al obtener los roles' });
     }
 });
@@ -19,14 +23,16 @@ router.get('/roles', async (req, res) => {
 router.get('/roles/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        const result = await db.query('SELECT * FROM roles WHERE id = $1', [id]);
-        if (result.rows.length === 0) {
-            res.status(404).json({ error: 'Rol no encontrado' });
-        } else {
-            res.json(result.rows[0]);
-        }
+        db.get('SELECT * FROM roles WHERE id = ?', [id], (err, row) => {
+            if (err) {
+                res.status(500).json({ error: 'Error al obtener el rol' });
+            } else if (!row) {
+                res.status(404).json({ error: 'Rol no encontrado' });
+            } else {
+                res.json(row);
+            }
+        });
     } catch (error) {
-        console.error('Error al obtener el rol:', error);
         res.status(500).json({ error: 'Error al obtener el rol' });
     }
 });
@@ -35,10 +41,14 @@ router.get('/roles/:id', async (req, res) => {
 router.post('/roles', async (req, res) => {
     const { nombre } = req.body;
     try {
-        const result = await db.query('INSERT INTO roles (nombre) VALUES ($1) RETURNING *', [nombre]);
-        res.status(201).json(result.rows[0]);
+        db.run('INSERT INTO roles (nombre) VALUES (?)', [nombre], function(err) {
+            if (err) {
+                res.status(500).json({ error: 'Error al crear el rol' });
+            } else {
+                res.status(201).json({ id: this.lastID, nombre });
+            }
+        });
     } catch (error) {
-        console.error('Error al crear el rol:', error);
         res.status(500).json({ error: 'Error al crear el rol' });
     }
 });
@@ -48,14 +58,16 @@ router.put('/roles/:id', async (req, res) => {
     const { id } = req.params;
     const { nombre } = req.body;
     try {
-        const result = await db.query('UPDATE roles SET nombre = $1 WHERE id = $2 RETURNING *', [nombre, id]);
-        if (result.rowCount === 0) {
-            res.status(404).json({ error: 'Rol no encontrado' });
-        } else {
-            res.json(result.rows[0]);
-        }
+        db.run('UPDATE roles SET nombre = ? WHERE id = ?', [nombre, id], function(err) {
+            if (err) {
+                res.status(500).json({ error: 'Error al actualizar el rol' });
+            } else if (this.changes === 0) {
+                res.status(404).json({ error: 'Rol no encontrado' });
+            } else {
+                res.json({ id, nombre });
+            }
+        });
     } catch (error) {
-        console.error('Error al actualizar el rol:', error);
         res.status(500).json({ error: 'Error al actualizar el rol' });
     }
 });
@@ -64,17 +76,16 @@ router.put('/roles/:id', async (req, res) => {
 router.delete('/roles/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        const result = await db.query('DELETE FROM roles WHERE id = $1 RETURNING *', [id]);
-        if (result.rowCount === 0) {
-            res.status(404).json({ error: 'Rol no encontrado' });
-        } else {
-            res.json({ message: 'Rol eliminado', deletedRol: result.rows[0] });
-        }
+        db.run('DELETE FROM roles WHERE id = ?', [id], function(err) {
+            if (err) {
+                res.status(500).json({ error: 'Error al eliminar el rol' });
+            } else if (this.changes === 0) {
+                res.status(404).json({ error: 'Rol no encontrado' });
+            } else {
+                res.json({ message: 'Rol eliminado' });
+            }
+        });
     } catch (error) {
-        console.error('Error al eliminar el rol:', error);
-        if (error.code === '23503') {
-            return res.status(409).json({ error: 'Error al eliminar el rol: Está siendo utilizado por uno o más usuarios.' });
-        }
         res.status(500).json({ error: 'Error al eliminar el rol' });
     }
 });
