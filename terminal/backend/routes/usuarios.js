@@ -199,6 +199,12 @@ router.post('/usuarios/login', async (req, res) => {
             return res.status(401).json({ error: 'Usuario no verificado. Por favor, verifica tu correo electrónico.' });
         }
 
+        // Asegurarse de que usuario.contraseña no es null o undefined antes de llamar a bcrypt.compare
+        if (!usuario.contraseña) {
+            console.error('Contraseña no encontrada para el usuario:', email);
+            return res.status(500).json({ error: 'Error interno del servidor al procesar la solicitud.' });
+        }
+
         const contraseñaValida = await bcrypt.compare(contraseña, usuario.contraseña);
         if (!contraseñaValida) {
             return res.status(401).json({ error: 'Credenciales incorrectas' });

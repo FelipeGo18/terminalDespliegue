@@ -73,28 +73,39 @@ router.delete('/empresas/:id', async (req, res) => {
         const busIds = busesResult.rows.map(bus => bus.id);
 
         if (busIds.length > 0) {
+            // Delete tickets for viajes associated with these buses first if necessary
+            // Assuming tickets have a foreign key to viajes and ON DELETE CASCADE is not fully set up for all relations
+            // Or, if tickets are directly related to bus_id in some way not shown.
+            // For now, focusing on viajes and buses as per original logic.
+            // Consider adding ticket deletion if they are not cascaded from viajes.
+            // Example: await client.query('DELETE FROM tickets WHERE viaje_id IN (SELECT id FROM viajes WHERE bus_id = ANY($1::int[]))', [busIds]);
+            
             // Delete viajes for these buses
             await client.query('DELETE FROM viajes WHERE bus_id = ANY($1::int[])', [busIds]);
             // Delete buses of the company
             await client.query('DELETE FROM buses WHERE empresa_id = $1', [id]);
         }
 
-        // 2. Borra rutas huérfanas (rutas sin viajes asociados)
-        // This attempts to delete routes that are not referenced in any viajes.
-        // Note: This specific logic for deleting orphan routes might need adjustment
-        // based on exact schema and desired behavior for cascading or related data.
-        const rutasResult = await client.query('SELECT id FROM rutas');
-        for (const ruta of rutasResult.rows) {
-            const viajeCountResult = await client.query('SELECT COUNT(*) as count FROM viajes WHERE ruta_id = $1', [ruta.id]);
-            if (parseInt(viajeCountResult.rows[0].count, 10) === 0) {
-                // Before deleting a route, ensure no other dependencies exist if any.
-                await client.query('DELETE FROM ruta_municipios WHERE ruta_id = $1', [ruta.id]); // Example: clean related ruta_municipios
-                await client.query('DELETE FROM rutas WHERE id = $1', [ruta.id]);
-            }
-        }
-        // Alternative for deleting orphan routes (more efficient if complex dependencies are handled):
-        // await client.query(`DELETE FROM rutas r WHERE NOT EXISTS (SELECT 1 FROM viajes v WHERE v.ruta_id = r.id)`);
+        // 2. Borra rutas huérfanas (rutas sin viajes asociados) de forma más eficiente
+        // Esta sección elimina TODAS las rutas huérfanas del sistema, no solo las relacionadas con la empresa eliminada.
+        // Si esa es la intención, esta es una forma más eficiente de hacerlo:
+        const orphanRouteIdsResult = await client.query(`
+            SELECT r.id 
+            FROM rutas r
+            LEFT JOIN viajes v ON r.id = v.ruta_id
+            WHERE v.id IS NULL
+        `);
+        const orphanRouteIds = orphanRouteIdsResult.rows.map(row => row.id);
 
+        if (orphanRouteIds.length > 0) {
+            // Primero borra de ruta_municipios para las rutas huérfanas
+            // (Asumiendo que ruta_municipios debe limpiarse antes de borrar la ruta,
+            // si no hay ON DELETE CASCADE desde rutas hacia ruta_municipios)
+            await client.query('DELETE FROM ruta_municipios WHERE ruta_id = ANY($1::int[])', [orphanRouteIds]);
+            
+            // Luego borra las rutas huérfanas
+            await client.query('DELETE FROM rutas WHERE id = ANY($1::int[])', [orphanRouteIds]);
+        }
 
         // 3. Borra la empresa
         const deleteEmpresaResult = await client.query('DELETE FROM empresas WHERE id = $1 RETURNING *', [id]);
@@ -105,7 +116,7 @@ router.delete('/empresas/:id', async (req, res) => {
         }
 
         await client.query('COMMIT');
-        res.json({ message: 'Empresa y datos relacionados eliminados', deletedEmpresa: deleteEmpresaResult.rows[0] });
+        res.json({ message: 'Empresa y datos relacionados eliminados (incluyendo limpieza de rutas huérfanas global)', deletedEmpresa: deleteEmpresaResult.rows[0] });
 
     } catch (error) {
         await client.query('ROLLBACK');

@@ -11,7 +11,7 @@ router.get('/rutas', async (req, res) => {
         const query = `
             SELECT r.id AS ruta_id, r.origen, r.destino, r.duracion_estimada, r.distancia_km,
                    e.id AS empresa_id, e.nombre AS empresa_nombre,
-                   b.id AS bus_id, b.numero_bus, b.conductor_id, u_cond.nombre as conductor_nombre, b.cat_asientos,
+                   b.id AS bus_id, b.numero_bus, b.conductor as conductor_id, u_cond.nombre as conductor_nombre, b.cat_asientos,
                    v.id AS viaje_id, v.salida, v.llegada, v.precio,
                    (
                        SELECT COUNT(*) FROM tickets t WHERE t.viaje_id = v.id
@@ -20,7 +20,7 @@ router.get('/rutas', async (req, res) => {
             LEFT JOIN viajes v ON v.ruta_id = r.id
             LEFT JOIN buses b ON b.id = v.bus_id
             LEFT JOIN empresas e ON e.id = b.empresa_id
-            LEFT JOIN usuarios u_cond ON b.conductor_id = u_cond.id
+            LEFT JOIN usuarios u_cond ON b.conductor = u_cond.id
             ORDER BY r.id, v.salida;
         `;
         const { rows } = await db.query(query);

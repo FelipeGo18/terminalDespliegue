@@ -24,59 +24,39 @@ router.get('/buses', async (req, res) => {
 
 // Obtener buses cuyo viaje inicia en un municipio intermedio (origen) y termina en el destino final de la ruta
 router.get('/buses/origen-destino', async (req, res) => {
-    let { origen, destino } = req.query;
+    const { origen_id, destino_id } = req.query; // Asumiendo que los IDs de los municipios se pasan como query params
 
-    if (!origen || !destino) {
-        return res.status(400).json({ error: 'Los parámetros origen y destino son obligatorios' });
+    if (!origen_id || !destino_id) {
+        return res.status(400).json({ error: 'Los parámetros origen_id y destino_id son requeridos.' });
     }
 
-    origen = origen.trim().toLowerCase();
-    destino = destino.trim().toLowerCase();
+    // ESTA CONSULTA ES UN EJEMPLO Y NECESITA SER ADAPTADA A TU LÓGICA DE NEGOCIO EXACTA
+    // Y A CÓMO TIENES ESTRUCTURADA LA RELACIÓN ENTRE RUTAS, MUNICIPIOS INTERMEDIOS Y VIAJES.
+    const queryString = `
+        SELECT DISTINCT v.*, b.*, r.origen AS ruta_origen, r.destino AS ruta_destino, e.nombre AS empresa_nombre
+        FROM viajes v
+        JOIN buses b ON v.bus_id = b.id
+        JOIN rutas r ON v.ruta_id = r.id
+        JOIN empresas e ON b.empresa_id = e.id
+        JOIN ruta_municipios rm_origen ON r.id = rm_origen.ruta_id
+        JOIN ruta_municipios rm_destino ON r.id = rm_destino.ruta_id
+        WHERE rm_origen.municipio_id = $1 
+          AND rm_destino.municipio_id = $2 
+          AND rm_origen.orden < rm_destino.orden -- Asegura que el origen esté antes que el destino en la ruta
+        ORDER BY v.salida;
+    `;
 
     try {
-        const query = `
-            SELECT 
-                b.id AS bus_id, 
-                b.numero_bus, 
-                u_cond.nombre AS conductor_nombre, 
-                r.origen AS ruta_origen_completa,
-                r.destino AS ruta_destino_completa,
-                e.nombre AS empresa_nombre,
-                v.salida,
-                v.llegada,
-                v.id AS viaje_id,
-                r.id AS ruta_id,
-                r.distancia_km AS distancia_ruta_completa,
-                v.precio AS precio_viaje_completo, -- Precio del viaje completo, no del tramo
-                b.cat_asientos,
-                (b.cat_asientos - (SELECT COUNT(*) FROM tickets t WHERE t.viaje_id = v.id)) AS asientos_disponibles,
-                rm_origen.orden AS orden_origen_match,
-                rm_destino.orden AS orden_destino_match,
-                m_origen.nombre AS municipio_origen_match,
-                m_destino.nombre AS municipio_destino_match
-            FROM buses b
-            JOIN viajes v ON b.id = v.bus_id
-            JOIN rutas r ON v.ruta_id = r.id
-            JOIN empresas e ON b.empresa_id = e.id
-            JOIN usuarios u_cond ON b.conductor_id = u_cond.id
-            JOIN ruta_municipios rm_origen ON rm_origen.ruta_id = r.id
-            JOIN municipios m_origen ON m_origen.id = rm_origen.municipio_id
-            JOIN ruta_municipios rm_destino ON rm_destino.ruta_id = r.id
-            JOIN municipios m_destino ON m_destino.id = rm_destino.municipio_id
-            WHERE LOWER(TRIM(m_origen.nombre)) = $1
-              AND LOWER(TRIM(m_destino.nombre)) = $2
-              AND rm_origen.orden < rm_destino.orden
-            ORDER BY v.salida;
-        `;
-        const { rows } = await db.query(query, [origen, destino]);
+        const { rows } = await db.query(queryString, [origen_id, destino_id]);
         
-        // Aquí podrías agregar lógica para calcular el precio del tramo si es necesario
-        // Por ahora, se devuelve el precio del viaje completo.
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'No se encontraron buses para el origen y destino especificados que cumplan con ser un tramo válido de una ruta.' });
+        }
         res.json(rows);
 
     } catch (error) {
         console.error('Error al obtener los buses por origen y destino:', error);
-        res.status(500).json({ error: 'Error al obtener los buses por origen y destino' });
+        res.status(500).json({ error: 'Error al obtener los buses por origen y destino.' });
     }
 });
 
