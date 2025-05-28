@@ -11,7 +11,7 @@ router.get('/rutas', async (req, res) => {
         const query = `
             SELECT r.id AS ruta_id, r.origen, r.destino, r.duracion_estimada, r.distancia_km,
                    e.id AS empresa_id, e.nombre AS empresa_nombre,
-                   b.id AS bus_id, b.numero_bus, b.conductor as conductor_id, u_cond.nombre as conductor_nombre, b.cat_asientos,
+                   b.id AS bus_id, b.numero_bus, b.conductor AS conductor_raw_id, u_cond.nombre AS conductor_nombre, b.cat_asientos, /* Renamed b.conductor to conductor_raw_id for clarity if needed, or ensure it's used correctly below */
                    v.id AS viaje_id, v.salida, v.llegada, v.precio,
                    (
                        SELECT COUNT(*) FROM tickets t WHERE t.viaje_id = v.id
@@ -19,8 +19,8 @@ router.get('/rutas', async (req, res) => {
             FROM rutas r
             LEFT JOIN viajes v ON v.ruta_id = r.id
             LEFT JOIN buses b ON b.id = v.bus_id
-            LEFT JOIN empresas e ON e.id = b.empresa_id
-            LEFT JOIN usuarios u_cond ON b.conductor = u_cond.id
+            LEFT JOIN empresas e ON e.id = b.empresa_id 
+            LEFT JOIN usuarios u_cond ON b.conductor::integer = u_cond.id /* Applied ::integer cast to b.conductor */
             ORDER BY r.id, v.salida;
         `;
         const { rows } = await db.query(query);
